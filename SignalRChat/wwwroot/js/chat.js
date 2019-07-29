@@ -1,6 +1,6 @@
 "use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("/ChatHub").build();
 
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
@@ -13,20 +13,44 @@ connection.on("ReceiveMessage", function (user, message) {
     document.getElementById("messagesList").appendChild(li);
 });
 
+connection.on("SendMessageClientConnectionId", function (connectionId) {
+    var x = document.getElementById("myList");
+    var option = document.createElement("option");
+    option.text = connectionId;
+    x.add(option);
+});
+
 connection.start().then(function(){
     document.getElementById("sendButton").disabled = false;
     var hub = connection ;
-         var connectionUrl = hub["connection"].transport.webSocket.url ;
-         console.log(connectionUrl);
-    // console.log("Connection é: " + $.connection.hub.id);
-}).catch(function (err) {
-    return console.error(err.toString());
+    var connectionUrl = hub["connection"].transport.webSocket.url ;
+    
+    var connectionId = connectionUrl.split("/ChatHub?id=");
+
+    connection.invoke("SendMessageClientConnectionId", connectionId[1]).catch(function (err) {
+        console.log("Connection é: " + $.connection.hub.id);
+        return console.error(err.toString());
+    }).catch(function (err) {
+    console.log(connectionUrl);
+        return console.error(err.toString());
+    });
 });
 
 document.getElementById("sendButton").addEventListener("click", function (event) {
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
+    var connectionId = document.getElementById('myList').value;
     connection.invoke("SendMessage", user, message).catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
+});
+
+document.getElementById("sendButtonIndividual").addEventListener("click", function (event) {
+    var user = document.getElementById("userInput").value;
+    var message = document.getElementById("messageInput").value;
+    var connectionId = document.getElementById('myList').value;
+    connection.invoke("SendMessageClient",connectionId, user, message).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();

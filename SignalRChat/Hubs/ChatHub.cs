@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
+using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace SignalRChat.Hubs
@@ -13,5 +15,15 @@ namespace SignalRChat.Hubs
         {
             await Clients.Client(conncetionId).SendAsync("ReceiveMessage", user, message);
         }
+        public async Task SendMessageClientConnectionId(string conncetionId)
+        {
+            await Clients.All.SendAsync("SendMessageClientConnectionId", conncetionId);
+            
+        }
+        public void GetConnectionId(string nome)
+        {
+            Console.WriteLine(Context.ConnectionId + "  -  " + nome);
+        }
+    
     }
 }
