@@ -39,7 +39,7 @@ connection.start().then(function(){
 document.getElementById("sendButton").addEventListener("click", function (event) {
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
-    var connectionId = document.getElementById('myList').value;
+    // var connectionId = document.getElementById('myList').value;
     connection.invoke("SendMessage", user, message).catch(function (err) {
         return console.error(err.toString());
     });
@@ -49,8 +49,31 @@ document.getElementById("sendButton").addEventListener("click", function (event)
 document.getElementById("sendButtonIndividual").addEventListener("click", function (event) {
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
-    var connectionId = document.getElementById('myList').value;
+    var connectionId = document.getElementById("myList").value;
     connection.invoke("SendMessageClient",connectionId, user, message).catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
+});
+
+document.getElementById("reiniciarControlador").addEventListener("click", function (event) {
+    var connectionId = document.getElementById("idConnection").value;
+    connection.invoke("ReiniciarControlador", connectionId).catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
+});
+document.getElementById("iniciarJogo").addEventListener("click", function (event) {
+    var connectionId = document.getElementById("idConnection").value;
+    connection.invoke("IniciarJogo", connectionId, "1").catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
+});
+
+document.getElementById("download").addEventListener("click", function (event) {
+    var connectionId = document.getElementById("idConnection").value;
+    connection.invoke("Download", connectionId).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();
