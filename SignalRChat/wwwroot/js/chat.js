@@ -102,6 +102,13 @@ document.getElementById("jogo2").addEventListener("click", function (event) {
     });
     event.preventDefault();
 });
+document.getElementById("controlador").addEventListener("click", function (event) {
+    var connectionId = document.getElementById("idConnection").value;
+    connection.invoke("DownloadControlador", connectionId, "1").catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
+});
 document.getElementById("jogo3").addEventListener("click", function (event) {
     var connectionId = document.getElementById("idConnection").value;
     connection.invoke("DownloadJogo3", connectionId).catch(function (err) {

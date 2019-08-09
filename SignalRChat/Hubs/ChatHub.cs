@@ -9,12 +9,13 @@ namespace SignalRChat.Hubs
     public class ChatHub : Hub
     {
         public List<Controlador> lista = new List<Controlador>();
+        private static int numOfClient;
 
         public async Task ReiniciarControlador(string connectionId)
         {
             await Clients.Client(connectionId).SendAsync("Reiniciar");
         }
-         public void StatusTarefa(string frase, string enderecoMac, bool status)
+        public void StatusTarefa(string frase, string enderecoMac, bool status)
         {
             if(status)
             {
@@ -25,8 +26,7 @@ namespace SignalRChat.Hubs
                 //Erro
                 Console.WriteLine(frase + "(MAC: " + enderecoMac + ")");
             }
-        }
-
+        } 
         public async Task IniciarJogo(string connectionId, int idJogo)
         {
             await Clients.Client(connectionId).SendAsync("IniciarJogo", idJogo);
@@ -60,19 +60,19 @@ namespace SignalRChat.Hubs
             string json = JsonConvert.SerializeObject(obj1);
             await Clients.All.SendAsync("Download", json);
             // await Clients.Client(connectionId).SendAsync("Download", json);
-        }
+        } 
         public async Task DownloadJogo2(string connectionId)
         {
             DadosAtualizador obj2 = new DadosAtualizador {
                 Autenticacao=false,
-                Nome = "Caipira",
+                Nome = "Caipira", 
                 Id=2,
                 Versao="1.0",
                 PathVideo=@"D:\Games\Caipira\1.0\Video\Havaianas2.mp4",
                 PathExecutavel=@"D:\Games\Caipira\1.0\Executavel\sublime_text.exe - Atalho",
                 URL_Atualizador="https://s3.us-east-2.amazonaws.com/www.rotasimuladores.com.br/JogoDois.zip",
                 Ativo=true
-            };
+            }; 
             string json = JsonConvert.SerializeObject(obj2);
             await Clients.All.SendAsync("Download", json);
             // await Clients.Client(connectionId).SendAsync("Download", json);
@@ -91,6 +91,17 @@ namespace SignalRChat.Hubs
             };
             string json = JsonConvert.SerializeObject(obj3);
             await Clients.All.SendAsync("Download", json);
+            // await Clients.Client(connectionId).SendAsync("Download", json);
+        }
+        public async Task DownloadControlador(string connectionId, string idControlador)
+        {
+            DadosAtualizador obj3 = new DadosAtualizador {
+                Autenticacao=false,
+                Nome = "GameController",
+                URL_Atualizador="https://s3.us-east-2.amazonaws.com/www.rotasimuladores.com.br/GameController.zip"
+            };
+            string json = JsonConvert.SerializeObject(obj3);
+            await Clients.All.SendAsync("DownloadControlador", json);
             // await Clients.Client(connectionId).SendAsync("Download", json);
         }
         public async Task DownloadJogo4(string connectionId)
@@ -133,20 +144,25 @@ namespace SignalRChat.Hubs
             //TODO verificar se a lista de jogos recebida condiz com a lista de jogos da estação no servidor
             var obj = JsonConvert.DeserializeObject(ListaJogosInstalados);
             Console.WriteLine(obj);
-            Console.WriteLine("ID: " + controlador.ConnectionId+ " - ");
+            Console.WriteLine("ID: " + controlador.ConnectionId);
             Console.WriteLine("MAC: " + controlador.MAC);
         }
-        // public void JogosInstalados(string ListaJogosInstalados)
-        // {
-             
-        //      var aaa=1;
-        //      var b=aaa;
-        //     // JavaScriptSerializer reader = new JavaScriptSerializer();
-        //     // var obj = reader.Deserialize<DadosAtualizador>(ListaJogosInstalados);
-        // }
-        // public void DownloadSucesso(string nomeJogo, string enderecoMac)
-        // {
-        //     Console.WriteLine("Download do aplicatico {0} realizado com sucesso no pc {1}", nomeJogo, enderecoMac);
-        // }
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            var ass = Context.ConnectionId;
+            await base.OnDisconnectedAsync(exception);
+            System.Threading.Interlocked.Decrement(ref numOfClient);
+            Console.WriteLine("Desconectado: " + numOfClient);
+            Console.WriteLine(ass );
+        }
+        public override async Task OnConnectedAsync()
+        {
+            var id = Context.ConnectionId;
+            await base.OnConnectedAsync();
+            System.Threading.Interlocked.Increment(ref numOfClient);
+            Console.WriteLine("Iniciando conexao {0}", numOfClient);
+            Console.WriteLine(id);  
+        }
+        
     }
 }

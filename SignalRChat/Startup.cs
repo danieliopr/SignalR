@@ -31,7 +31,10 @@ namespace SignalRChat
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
+            services.Configure<IISOptions>(options =>
+            {
+                options.AutomaticAuthentication = false;
+            });
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSignalR();
